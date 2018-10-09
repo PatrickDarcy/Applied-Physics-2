@@ -16,12 +16,16 @@
 
 #include "SFML/Graphics.hpp" 
 #include "SFML/OpenGL.hpp" 
+#include <math.h>
 
 #include <iostream>
 
 
 int main()
 {
+	float pixelsToMeters = 10.0f;
+	float angleInRads = 0.0f;
+	float angleInDegrees = 360.0f;
 	sf::RenderWindow window(sf::VideoMode(800, 800), "Go Physics!!");
 
 	sf::RectangleShape ground;
@@ -35,7 +39,7 @@ int main()
 	sf::Vector2f velocity(0, 0);
 	sf::Vector2f position(100, 680);
 
-	sf::Vector2f gravity(0.0f, 9.8f);
+	sf::Vector2f gravity(0.0f, 9.8f * pixelsToMeters);
 
 	sf::Time currentTime;
 	sf::Text timeInAir;
@@ -85,9 +89,9 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && position.y >= 680)
 			{
-				velocity = { 44.27f,-44.27f };
+				velocity = { cos(angleOfProj),-104.27f };
 				currentTime = sf::seconds(0.0f);
 
 				m_maxHeight = (velocity.y * velocity.y) / (2.0 * gravity.y);
@@ -95,6 +99,16 @@ int main()
 
 				maxHeight.setString("Max Height: " + std::to_string(m_maxHeight));
 				predictTime.setString("Predicted Time: " + std::to_string(m_predictTime));
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+			{
+				position = { 100, 680 };
+				velocity = { 0,0 };
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+			{
+				angleInRads = angleInDegrees * (3.14 / 180);
+
 			}
 		}
 
