@@ -69,7 +69,7 @@ int main()
 	predictTime.setPosition(50, 160);
 
 	float m_maxHeight = 0.0f;
-	float m_predictTime;
+	float m_predictTime = 0.0f;
 
 	sf::Clock clock;
 
@@ -91,11 +91,12 @@ int main()
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && position.y >= 680)
 			{
-				velocity = { cos(angleOfProj),-104.27f };
+				//velocity = { cos(angleOfProj),-104.27f };
 				currentTime = sf::seconds(0.0f);
 
-				m_maxHeight = (velocity.y * velocity.y) / (2.0 * gravity.y);
-				m_predictTime = (2.0 * -velocity.y) / gravity.y;
+				velocity = { 12.0f * pixelsToMeters, -12.0f * pixelsToMeters } ;
+				//m_maxHeight = (velocity.y * velocity.y) / (2.0 * gravity.y);
+				//m_predictTime = (2.0 * -velocity.y) / gravity.y;
 
 				maxHeight.setString("Max Height: " + std::to_string(m_maxHeight));
 				predictTime.setString("Predicted Time: " + std::to_string(m_predictTime));
