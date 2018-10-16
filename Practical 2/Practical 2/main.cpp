@@ -25,12 +25,14 @@ int main()
 {
 	float pixelsToMeters = 10.0f;
 	float angleInRads = 0.0f;
-	float angleInDegrees = 360.0f;
+	float angleInDegrees = 270.0f;
+	float e = 0.5f;
+
 	sf::RenderWindow window(sf::VideoMode(800, 800), "Go Physics!!");
 
 	sf::RectangleShape ground;
 	ground.setFillColor(sf::Color::Red);
-	ground.setPosition(0, 700);
+	ground.setPosition(0, 710);
 	ground.setSize(sf::Vector2f{ 800,100 });
 
 	sf::CircleShape shape(10.0f);
@@ -38,38 +40,46 @@ int main()
 
 	sf::Vector2f velocity(0, 0);
 	sf::Vector2f position(100, 680);
+	sf::Vector2f intialVelocity(1, 1);
 
 	sf::Vector2f gravity(0.0f, 9.8f * pixelsToMeters);
 
-	sf::Time currentTime;
+	sf::Time currentTime = { sf::seconds(0.0f) };
+
 	sf::Text timeInAir;
 	sf::Text maxHeight;
-	sf::Text predictTime;
+	sf::Text angleOfProjection;
+	sf::Text intialVel;
 	sf::Font font;
 
 	if (!font.loadFromFile("game_over.ttf"))
 	{
 		std::string s("Error loading texture");
+
 		throw std::exception(s.c_str());
 	}
 
 	timeInAir.setCharacterSize(50);
 	timeInAir.setFillColor(sf::Color::White);
 	timeInAir.setFont(font);
-	timeInAir.setPosition(50, 105);
+	timeInAir.setPosition(50, 90);
 
 	maxHeight.setCharacterSize(50);
 	maxHeight.setFillColor(sf::Color::White);
 	maxHeight.setFont(font);
 	maxHeight.setPosition(50, 50);
 
-	predictTime.setCharacterSize(50);
-	predictTime.setFillColor(sf::Color::White);
-	predictTime.setFont(font);
-	predictTime.setPosition(50, 160);
+	angleOfProjection.setCharacterSize(50);
+	angleOfProjection.setFillColor(sf::Color::White);
+	angleOfProjection.setFont(font);
+	angleOfProjection.setPosition(50, 130);
+
+	intialVel.setCharacterSize(50);
+	intialVel.setFillColor(sf::Color::White);
+	intialVel.setFont(font);
+	intialVel.setPosition(50, 170);
 
 	float m_maxHeight = 0.0f;
-	float m_predictTime = 0.0f;
 
 	sf::Clock clock;
 
@@ -91,15 +101,11 @@ int main()
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && position.y >= 680)
 			{
-				//velocity = { cos(angleOfProj),-104.27f };
-				currentTime = sf::seconds(0.0f);
-
-				velocity = { 12.0f * pixelsToMeters, -12.0f * pixelsToMeters } ;
-				//m_maxHeight = (velocity.y * velocity.y) / (2.0 * gravity.y);
-				//m_predictTime = (2.0 * -velocity.y) / gravity.y;
-
+				angleInRads = angleInDegrees * (3.14 * 180);
+				velocity = intialVelocity * pixelsToMeters;
+				velocity.x = velocity.x * std::cos(angleInRads);
+				velocity.y = velocity.y * std::cos(angleInRads);
 				maxHeight.setString("Max Height: " + std::to_string(m_maxHeight));
-				predictTime.setString("Predicted Time: " + std::to_string(m_predictTime));
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 			{
@@ -108,12 +114,30 @@ int main()
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
 			{
-				angleInRads = angleInDegrees * (3.14 / 180);
-
+				if (angleInDegrees > 270)
+				{
+					angleInDegrees--;
+				}
+			
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::U))
+			{
+				if (angleInDegrees < 360)
+				{
+					angleInDegrees++;
+				}
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::V))
+			{
+				intialVelocity += {1, 1};
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::B))
+			{
+				intialVelocity -= {1, 1};
 			}
 		}
 
-
+		velocity.y = - e * velocity.y;
 
 		//get the time since last update and restart the clock
 		timeSinceLastUpdate += clock.restart();
@@ -146,7 +170,10 @@ int main()
 			window.draw(ground);
 			window.draw(timeInAir);
 			window.draw(maxHeight);
-			window.draw(predictTime);
+			angleOfProjection.setString("Angle of Projection : " + std::to_string(angleInDegrees));
+			window.draw(angleOfProjection);
+			intialVel.setString("Intial Velocity : " + std::to_string(intialVelocity.x));
+			window.draw(intialVel);
 
 			window.display();
 			timeSinceLastUpdate = sf::Time::Zero;
